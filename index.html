@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云序茶居 | 天地云序 雅器传家</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #c9a86c;
+            --bg-cream: #faf8f5;
+            --bg-warm: #f5f0e8;
+            --text-gray: #666;
+            --border: #e8e4dc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans SC', sans-serif; color: var(--primary); background: var(--bg-cream); line-height: 1.8; overflow: hidden; height: 100vh; }
+
+        /* 布局容器 */
+        .app-container { display: flex; height: 100vh; }
+
+        /* 左侧固定导航 */
+        .sidebar { width: 280px; background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 40px 0; position: relative; z-index: 100; }
+        .sidebar-logo { padding: 0; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .sidebar-logo .logo-link { display: block; }
+        .sidebar-logo .logo-link img { width: 100%; height: auto; display: block; }
+
+        .sidebar-qr { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .sidebar-qr h4 { font-family: 'Noto Serif SC', serif; font-size: 14px; font-weight: 400; letter-spacing: 2px; color: var(--primary); margin-bottom: 15px; }
+        .sidebar-qr .qr-box { width: 160px; height: 160px; margin: 0 auto 15px; background: var(--bg-warm); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+        .sidebar-qr .qr-box img { max-width: 90%; max-height: 90%; }
+        .sidebar-qr p { font-size: 12px; color: var(--text-gray); line-height: 1.8; letter-spacing: 1px; }
+
+        .nav-menu { list-style: none; padding: 0 20px; }
+        .nav-menu li { margin-bottom: 8px; }
+        .nav-menu a { display: flex; align-items: center; padding: 16px 20px; color: var(--text-gray); text-decoration: none; font-size: 14px; letter-spacing: 2px; border-radius: 8px; transition: all 0.3s ease; position: relative; }
+        .nav-menu a:hover { background: var(--bg-cream); color: var(--primary); }
+        .nav-menu a.active { background: var(--secondary); color: #fff; }
+        .nav-menu a.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #fff; }
+        .nav-menu .nav-num { font-family: 'Noto Serif SC', serif; font-size: 12px; color: var(--secondary); margin-right: 12px; opacity: 0.6; }
+        .nav-menu a.active .nav-num { color: var(--secondary); opacity: 1; }
+
+        .sidebar-footer { margin-top: auto; padding: 30px; text-align: center; }
+        .sidebar-footer p { font-size: 11px; color: var(--text-gray); letter-spacing: 1px; margin-bottom: 8px; }
+        .beian-link { font-size: 10px; color: var(--text-gray); text-decoration: underline; letter-spacing: 1px; transition: color 0.3s ease; }
+        .beian-link:hover { color: var(--secondary); }
+
+        /* 右侧内容区域 */
+        .content-area { flex: 1; position: relative; overflow: hidden; }
+        .tab-content { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; visibility: hidden; transition: all 0.5s ease; overflow-y: auto; padding: 60px; }
+        .tab-content.active { opacity: 1; visibility: visible; }
+
+        /* 页面标题 */
+        .page-header { margin-bottom: 50px; }
+        .page-header .label { font-size: 11px; letter-spacing: 4px; color: var(--secondary); margin-bottom: 12px; text-transform: uppercase; }
+        .page-header h1 { font-family: 'Noto Serif SC', serif; font-size: 42px; font-weight: 300; letter-spacing: 8px; }
+
+        /* ===== 首页标签 - 斜切角布局 ===== */
+        .home-hero { position: relative; height: 100%; display: flex; align-items: center; overflow: hidden; }
+        .home-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-warm) 100%); }
+        .home-bg::before { content: ''; position: absolute; top: 0; left: 0; width: 60%; height: 100%; background: #fff; clip-path: polygon(0 0, 85% 0, 65% 100%, 0 100%); }
+        .home-content { position: relative; z-index: 10; width: 50%; padding-left: 80px; padding-right: 40px; margin-top: -95px; }
+        .home-text .brand-name { font-family: 'Noto Serif SC', serif; font-size: 24px; color: var(--secondary); letter-spacing: 8px; margin-bottom: 20px; }
+        .home-text .slogan { font-family: 'Noto Serif SC', serif; font-size: 52px; font-weight: 300; letter-spacing: 16px; line-height: 1.3; margin-bottom: 25px; }
+        .home-text .slogan span { display: block; font-size: 22px; color: var(--secondary); letter-spacing: 6px; margin-top: 15px; font-weight: 400; }
+        .home-text .positioning { font-family: 'Noto Serif SC', serif; font-size: 18px; color: var(--text-gray); letter-spacing: 3px; padding-left: 20px; border-left: 3px solid var(--secondary); margin-bottom: 35px; }
+        .home-text .desc { font-size: 15px; color: var(--text-gray); line-height: 2; margin-bottom: 40px; max-width: 460px; }
+        .home-cta-group { display: flex; gap: 15px; flex-wrap: wrap; }
+        .home-cta { display: inline-flex; padding: 16px 40px; background: transparent; border: 2px solid var(--secondary); color: var(--secondary); text-decoration: none; font-size: 14px; letter-spacing: 3px; transition: all 0.3s ease; }
+        .home-cta:hover { background: var(--secondary); color: #fff; }
+
+        /* 右下角轮播图 */
+        .home-slider { position: absolute; right: 0; top: 50%; transform: translateY(calc(-50% + 75px)); width: 45%; height: 70%; clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); cursor: grab; }
+        .home-slider:active { cursor: grabbing; }
+        .slider-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
+        .slider-track { display: flex; transition: transform 0.4s ease; height: 100%; }
+        .slider-slide { min-width: 100%; height: 100%; position: relative; overflow: hidden; }
+        .slider-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .slider-dots { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 20; }
+        .slider-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.3s ease; }
+        .slider-dot.active { background: var(--secondary); transform: scale(1.3); }
+        .slider-info { position: absolute; bottom: 30px; left: 40px; z-index: 20; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .slider-info h4 { font-family: 'Noto Serif SC', serif; font-size: 22px; letter-spacing: 4px; margin-bottom: 6px; }
+        .slider-info p { font-size: 13px; letter-spacing: 2px; opacity: 0.9; }
+        .swipe-hint { position: absolute; top: 20px; right: 30px; z-index: 20; color: #fff; font-size: 12px; letter-spacing: 2px; opacity: 0.7; display: flex; align-items: center; gap: 8px; }
+        .swipe-hint::before { content: '←'; }
+        .swipe-hint::after { content: '→'; }
+
+        /* ===== 品牌实力标签 - 大气设计 ===== */
+        .strength-hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; margin-bottom: 60px; align-items: center; }
+        .strength-main { padding-right: 40px; }
+        .strength-main .lead { font-family: 'Noto Serif SC', serif; font-size: 32px; font-weight: 300; line-height: 1.6; letter-spacing: 4px; margin-bottom: 30px; color: var(--primary); }
+        .strength-main .lead span { color: var(--secondary); }
+        .strength-main .desc { font-size: 15px; color: var(--text-gray); line-height: 2; margin-bottom: 40px; }
+        .strength-visual { position: relative; height: 400px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .strength-visual img { width: 100%; height: 100%; object-fit: cover; }
+        .strength-stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-bottom: 60px; border: 1px solid var(--border); }
+        .stat-item { text-align: center; padding: 50px 30px; background: #fff; position: relative; }
+        .stat-item:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 20%; bottom: 20%; width: 1px; background: var(--border); }
+        .stat-item .num { font-family: 'Noto Serif SC', serif; font-size: 56px; font-weight: 300; color: var(--secondary); margin-bottom: 15px; letter-spacing: 2px; }
+        .stat-item .label { font-size: 14px; color: var(--text-gray); letter-spacing: 2px; }
+        .stat-item .sublabel { font-size: 12px; color: var(--text-gray); opacity: 0.6; margin-top: 5px; }
+        .strength-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .feature-card { text-align: center; padding: 50px 30px; background: #fff; border: 1px solid var(--border); transition: all 0.4s ease; }
+        .feature-card:hover { transform: translateY(-10px); border-color: var(--secondary); box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
+        .feature-card .icon-wrap { width: 90px; height: 90px; margin: 0 auto 30px; border: 2px solid var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .feature-card .icon-wrap span { font-family: 'Noto Serif SC', serif; font-size: 36px; color: var(--secondary); }
+        .feature-card h3 { font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 400; margin-bottom: 20px; letter-spacing: 4px; }
+        .feature-card p { font-size: 14px; color: var(--text-gray); line-height: 1.8; }
+
+        /* ===== 材质工艺标签 ===== */
+        .materials-list { display: flex; flex-direction: column; gap: 25px; }
+        .material-item { display: grid; grid-template-columns: 80px 1fr 200px; gap: 30px; align-items: center; padding: 30px; background: #fff; border: 1px solid var(--border); transition: all 0.3s ease; }
+        .material-item:hover { border-color: var(--secondary); transform: translateX(10px); }
+        .material-icon { width: 60px; height: 60px; background: var(--bg-warm); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .material-info h3 { font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 400; margin-bottom: 8px; letter-spacing: 3px; }
+        .material-info p { font-size: 14px; color: var(--text-gray); }
+        .material-tag { text-align: right; }
+        .material-tag span { display: inline-block; padding: 8px 16px; background: var(--bg-warm); font-size: 12px; letter-spacing: 1px; color: var(--text-gray); }
+
+        /* ===== 尊享定制标签 ===== */
+        .custom-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .custom-box { background: #fff; padding: 40px; border: 1px solid var(--border); }
+        .custom-box.alt { background: var(--bg-warm); }
+        .custom-box h3 { font-family: 'Noto Serif SC', serif; font-size: 24px; font-weight: 400; margin-bottom: 25px; letter-spacing: 4px; display: flex; align-items: center; gap: 15px; color: var(--primary); }
+        .custom-box h3 .num { font-size: 14px; color: var(--secondary); }
+        .feature-list { list-style: none; }
+        .feature-list li { display: flex; align-items: flex-start; gap: 15px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list .icon { width: 40px; height: 40px; background: var(--bg-warm); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; color: var(--secondary); }
+        .custom-box.alt .feature-list .icon { background: #fff; }
+        .feature-list h4 { font-size: 16px; margin-bottom: 5px; color: var(--primary); }
+        .feature-list p { font-size: 13px; color: var(--text-gray); }
+        .process-flow { display: flex; flex-direction: column; gap: 20px; }
+        .process-step { display: flex; align-items: center; gap: 20px; padding: 20px; background: #fff; border-left: 3px solid var(--secondary); }
+        .process-step .step-num { font-family: 'Noto Serif SC', serif; font-size: 28px; color: var(--secondary); font-weight: 300; min-width: 50px; }
+        .process-step h4 { font-size: 16px; margin-bottom: 4px; letter-spacing: 2px; color: var(--primary); }
+        .process-step p { font-size: 13px; color: var(--text-gray); }
+
+        /* ===== 页面微信入口 ===== */
+        .page-wechat-entry { margin-top: 40px; text-align: center; }
+
+        /* ===== 臻选系列标签 ===== */
+        .products-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; }
+        .product-showcase { position: relative; background: linear-gradient(135deg, var(--bg-warm) 0%, #fff 100%); border: 1px solid var(--border); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .product-showcase img { width: 100%; height: 100%; object-fit: cover; }
+        .product-showcase .tag { position: absolute; top: 30px; left: 30px; padding: 10px 20px; background: var(--secondary); color: #fff; font-size: 12px; letter-spacing: 2px; }
+        .product-detail h2 { font-family: 'Noto Serif SC', serif; font-size: 32px; font-weight: 300; margin-bottom: 15px; letter-spacing: 6px; }
+        .product-detail .spec { font-size: 15px; color: var(--text-gray); margin-bottom: 25px; letter-spacing: 2px; }
+        .product-detail .desc { font-size: 15px; color: var(--text-gray); line-height: 2; margin-bottom: 30px; }
+        .product-detail .price { font-family: 'Noto Serif SC', serif; font-size: 20px; color: var(--secondary); margin-bottom: 30px; letter-spacing: 2px; }
+        .product-btns { display: flex; gap: 15px; flex-wrap: wrap; }
+        .home-cta-outline { background: transparent; border: 2px solid var(--secondary); color: var(--secondary); }
+        .home-cta-outline:hover { background: var(--secondary); color: #fff; }
+        .product-grid-small { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+        .product-small { background: #fff; border: 1px solid var(--border); padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .product-small:hover { border-color: var(--secondary); }
+        .product-small.active { background: var(--bg-warm); border-color: var(--secondary); }
+        .product-small.active h4 { color: var(--primary); }
+        .product-small h4 { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 400; margin-bottom: 5px; letter-spacing: 2px; color: var(--primary); }
+        .product-small p { font-size: 12px; color: var(--text-gray); }
+        .product-small.active p { color: var(--text-gray); }
+
+        /* ===== 微信二维码弹窗 ===== */
+        .wechat-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .wechat-modal.active { display: flex; }
+        .wechat-modal-content { background: #fff; padding: 60px; text-align: center; max-width: 480px; position: relative; }
+        .wechat-modal-close { position: absolute; top: 20px; right: 25px; font-size: 28px; color: var(--text-gray); cursor: pointer; }
+        .wechat-modal-close:hover { color: var(--primary); }
+        .wechat-modal h3 { font-family: 'Noto Serif SC', serif; font-size: 24px; font-weight: 400; margin-bottom: 15px; letter-spacing: 4px; }
+        .wechat-modal p { font-size: 15px; color: var(--text-gray); margin-bottom: 30px; }
+        .wechat-qr { width: 280px; height: 280px; margin: 0 auto; background: var(--bg-warm); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+        .wechat-qr img { max-width: 100%; max-height: 100%; }
+
+        /* ===== 茶台详情弹窗 ===== */
+        .detail-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .detail-modal.active { display: flex; }
+        .detail-modal-content { background: #fff; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; display: flex; flex-direction: column; }
+        .detail-modal-close { position: absolute; top: 20px; right: 25px; font-size: 28px; color: var(--text-gray); cursor: pointer; z-index: 10; }
+        .detail-modal-close:hover { color: var(--primary); }
+        .detail-modal-image { background: var(--bg-warm); display: flex; align-items: center; justify-content: center; padding: 40px; }
+        .detail-modal-image img { max-width: 100%; max-height: 400px; width: auto; height: auto; object-fit: contain; }
+        .detail-modal-info { padding: 40px 50px; }
+        .detail-modal-info h3 { font-family: 'Noto Serif SC', serif; font-size: 28px; font-weight: 400; margin-bottom: 10px; letter-spacing: 4px; }
+        .detail-modal-info .spec { font-size: 14px; color: var(--secondary); letter-spacing: 2px; margin-bottom: 20px; }
+        .detail-modal-info .desc { font-size: 15px; color: var(--text-gray); line-height: 2; margin-bottom: 25px; }
+        .detail-params { border-top: 1px solid var(--border); padding-top: 25px; }
+        .detail-params h4 { font-size: 14px; letter-spacing: 2px; margin-bottom: 20px; color: var(--primary); }
+        .param-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .param-row:last-child { border-bottom: none; }
+        .param-label { color: var(--text-gray); }
+        .param-value { color: var(--primary); }
+
+        /* ===== 联系我们标签 ===== */
+        .contact-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 60px; }
+        .contact-info-box { background: var(--bg-warm); padding: 50px; border: 1px solid var(--border); }
+        .contact-info-box h3 { font-family: 'Noto Serif SC', serif; font-size: 28px; font-weight: 300; margin-bottom: 30px; letter-spacing: 4px; color: var(--primary); }
+        .contact-intro { margin-bottom: 35px; padding-bottom: 30px; border-bottom: 1px solid var(--border); }
+        .contact-intro p { font-size: 14px; color: var(--text-gray); line-height: 2; }
+        .contact-item { margin-bottom: 30px; padding-left: 20px; border-left: 2px solid var(--secondary); }
+        .contact-item h4 { font-size: 12px; letter-spacing: 2px; color: var(--secondary); margin-bottom: 10px; }
+        .contact-item p { font-size: 16px; letter-spacing: 1px; color: var(--text-gray); }
+        .contact-qr-box { background: #fff; padding: 50px; border: 1px solid var(--border); text-align: center; }
+        .contact-qr-box h4 { font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 400; letter-spacing: 4px; margin-bottom: 15px; color: var(--primary); }
+        .contact-qr-box > p { font-size: 14px; color: var(--text-gray); margin-bottom: 30px; }
+        .contact-qr-img { width: 240px; height: 240px; margin: 0 auto 25px; background: var(--bg-warm); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+        .contact-qr-img img { max-width: 90%; max-height: 90%; }
+        .contact-qr-tip { padding-top: 20px; border-top: 1px solid var(--border); }
+        .contact-qr-tip span { display: block; font-size: 13px; color: var(--text-gray); margin-bottom: 8px; }
+        .contact-qr-tip strong { font-family: 'Noto Serif SC', serif; font-size: 18px; color: var(--secondary); letter-spacing: 2px; font-weight: 400; }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-cream); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="#" class="logo-link"><img src="images/logo.jpg" alt="云序茶居"></a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" class="active" onclick="showTab('home', this)"><span class="nav-num">01</span>品牌印象</a></li>
+                <li><a href="#" onclick="showTab('strength', this)"><span class="nav-num">02</span>品牌实力</a></li>
+                <li><a href="#" onclick="showTab('materials', this)"><span class="nav-num">03</span>材质工艺</a></li>
+                <li><a href="#" onclick="showTab('custom', this)"><span class="nav-num">04</span>尊享定制</a></li>
+                <li><a href="#" onclick="showTab('products', this)"><span class="nav-num">05</span>臻选系列</a></li>
+                <li><a href="#" onclick="showTab('contact', this)"><span class="nav-num">06</span>联系我们</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <p>@云序茶居 版权所有</p>
+                <a href="https://beian.miit.gov.cn" target="_blank" class="beian-link">吉ICP备2026002947号-2</a>
+            </div>
+        </aside>
+
+        <!-- 右侧内容区 -->
+        <main class="content-area">
+            <!-- 首页 -->
+            <div class="tab-content active" id="tab-home">
+                <div class="home-hero">
+                    <div class="home-bg"></div>
+                    <div class="home-content">
+                        <div class="home-text">
+                            <p class="brand-name">YUNXU TEA HOUSE</p>
+                            <h2 class="slogan">天地云序<span>雅器传家</span></h2>
+                            <p class="positioning">以云为意，以序为法，匠造茶桌之本</p>
+                            <p class="desc">专注高端实木茶台私人定制，为您打造可传承世家的雅器。每一件作品都是独一无二的艺术品，承载着东方美学与匠心精神。</p>
+                            <div class="home-cta-group">
+                                <a href="#" class="home-cta" onclick="showTab('custom', document.querySelectorAll('.nav-menu a')[3])">开启定制之旅</a>
+                                <a href="#" class="home-cta home-cta-outline" onclick="showTab('products', document.querySelectorAll('.nav-menu a')[4])">探索臻选系列</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="home-slider" id="homeSlider">
+                        <div class="slider-container">
+                            <div class="slider-track" id="sliderTrack">
+                                <div class="slider-slide">
+                                    <img src="images/guanyun.jpeg" alt="观云茶台">
+                                    <div class="slider-info">
+                                        <h4>观云茶台</h4>
+                                        <p>北美胡桃木 · 宝格丽黑大理石</p>
+                                    </div>
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/wangyue.jpeg" alt="望月茶台">
+                                    <div class="slider-info">
+                                        <h4>望月茶台</h4>
+                                        <p>榆木炭黑 · 宝格丽黑大理石</p>
+                                    </div>
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/tingsong.jpeg" alt="听松茶台">
+                                    <div class="slider-info">
+                                        <h4>听松茶台</h4>
+                                        <p>柚木原木 · 寒江雪大理石</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slider-dots">
+                                <div class="slider-dot active" onclick="goToSlide(0)"></div>
+                                <div class="slider-dot" onclick="goToSlide(1)"></div>
+                                <div class="slider-dot" onclick="goToSlide(2)"></div>
+                            </div>
+                            <div class="swipe-hint">滑动切换</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 品牌实力 -->
+            <div class="tab-content" id="tab-strength">
+                <div class="page-header">
+                    <p class="label">Our Strength</p>
+                    <h1>品牌实力</h1>
+                </div>
+                <div class="strength-hero">
+                    <div class="strength-main">
+                        <p class="lead">以序为法，<br><span>匠造东方茶居之美</span></p>
+                        <p class="desc">云序茶居，源自对东方茶文化的深刻理解与当代生活美学的执着追求。我们不止于制造茶台，更致力于构建一方承载人文精神与生活温度的茶居空间。从选材到成品，每一道工序皆秉持匠心，只为呈现一件可传世的雅器。</p>
+                        <a href="#" class="home-cta" onclick="showTab('custom', document.querySelectorAll('.nav-menu a')[3])">了解定制服务</a>
+                    </div>
+                    <div class="strength-visual">
+                        <img src="images/pinpai.jpeg" alt="品牌实力">
+                    </div>
+                </div>
+                <div class="strength-stats-bar">
+                    <div class="stat-item">
+                        <div class="num">10万+</div>
+                        <div class="label">平方米</div>
+                        <div class="sublabel">智能制造基地</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="num">50-60</div>
+                        <div class="label">天</div>
+                        <div class="sublabel">精工细作周期</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="num">1对1</div>
+                        <div class="label">专属定制</div>
+                        <div class="sublabel">全程管家服务</div>
+                    </div>
+                </div>
+                <div class="strength-features">
+                    <div class="feature-card">
+                        <div class="icon-wrap"><span>领</span></div>
+                        <h3>行业领军</h3>
+                        <p>国内现代茶台行业领军品牌，专注高端市场</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-wrap"><span>企</span></div>
+                        <h3>品牌归属</h3>
+                        <p>珲春云序智联信息科技有限公司旗下品牌</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-wrap"><span>地</span></div>
+                        <h3>生产基地</h3>
+                        <p>浙江台州10万㎡生产基地，先进设备与工艺</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 材质工艺 -->
+            <div class="tab-content" id="tab-materials">
+                <div class="page-header">
+                    <p class="label">Materials & Craft</p>
+                    <h1>材质工艺</h1>
+                </div>
+                <div class="materials-list">
+                    <div class="material-item">
+                        <div class="material-icon">🌳</div>
+                        <div class="material-info">
+                            <h3>欧洲进口榉木框架</h3>
+                            <p>选用欧洲优质榉木，质地坚硬、纹理优美，为茶台提供稳固支撑</p>
+                        </div>
+                        <div class="material-tag"><span>框架材质</span></div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-icon">🪵</div>
+                        <div class="material-info">
+                            <h3>E0级实木多层板台面</h3>
+                            <p>环保等级达到E0标准，健康无醛，结构稳定不易变形</p>
+                        </div>
+                        <div class="material-tag"><span>台面材质</span></div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-icon">⛰️</div>
+                        <div class="material-info">
+                            <h3>天然大理石</h3>
+                            <p>精选天然大理石，每一块纹理独一无二，彰显自然之美</p>
+                        </div>
+                        <div class="material-tag"><span>装饰材质</span></div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-icon">🎨</div>
+                        <div class="material-info">
+                            <h3>意大利进口ALPI木皮</h3>
+                            <p>采用意大利ALPI品牌木皮，色彩饱满、质感细腻</p>
+                        </div>
+                        <div class="material-tag"><span>表面工艺</span></div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-icon">✨</div>
+                        <div class="material-info">
+                            <h3>意大利ICA油漆</h3>
+                            <p>使用意大利ICA环保油漆，色泽持久、触感温润</p>
+                        </div>
+                        <div class="material-tag"><span>涂装工艺</span></div>
+                    </div>
+                </div>
+                <div class="page-wechat-entry">
+                    <a href="#" class="home-cta" onclick="showWechatModal()">添加微信咨询</a>
+                </div>
+            </div>
+
+            <!-- 尊享定制 -->
+            <div class="tab-content" id="tab-custom">
+                <div class="page-header">
+                    <p class="label">Customization</p>
+                    <h1>尊享定制</h1>
+                </div>
+                <div class="custom-container">
+                    <div class="custom-box">
+                        <h3><span class="num">01</span>核心优势</h3>
+                        <ul class="feature-list">
+                            <li>
+                                <div class="icon">材</div>
+                                <div>
+                                    <h4>甄选材质</h4>
+                                    <p>严选北美黑胡桃、缅甸花梨等名贵实木木材</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="icon">辅</div>
+                                <div>
+                                    <h4>珍惜辅材</h4>
+                                    <p>欧美进口珍惜木皮以及全球稀有天然大理石等辅助材料</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="icon">工</div>
+                                <div>
+                                    <h4>匠心工艺</h4>
+                                    <p>传统工艺与现代工业级制造，历时50-60天精工细作</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="icon">定</div>
+                                <div>
+                                    <h4>私人定制</h4>
+                                    <p>每一处细节皆可按您的需求量身定制</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="custom-box alt">
+                        <h3><span class="num">02</span>定制流程</h3>
+                        <div class="process-flow">
+                            <div class="process-step">
+                                <div class="step-num">壹</div>
+                                <div>
+                                    <h4>需求沟通</h4>
+                                    <p>深入了解您的空间与需求</p>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-num">贰</div>
+                                <div>
+                                    <h4>方案设计</h4>
+                                    <p>设计师一对一专属定制</p>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-num">叁</div>
+                                <div>
+                                    <h4>选材制作</h4>
+                                    <p>甄选良材，匠心打造</p>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-num">肆</div>
+                                <div>
+                                    <h4>品鉴交付</h4>
+                                    <p>精工细作品鉴，全国配送</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-wechat-entry">
+                    <a href="#" class="home-cta" onclick="showWechatModal()">添加微信咨询</a>
+                </div>
+            </div>
+
+            <!-- 臻选系列 -->
+            <div class="tab-content" id="tab-products">
+                <div class="page-header">
+                    <p class="label">Collection</p>
+                    <h1>臻选系列</h1>
+                </div>
+                <div class="products-layout">
+                    <div class="product-showcase" data-product="观云" id="product-display">
+                        <img src="images/guanyun2.jpeg" alt="观云茶台">
+                        <span class="tag">典藏</span>
+                    </div>
+                    <div class="product-detail" id="product-info">
+                        <h2>观云茶台</h2>
+                        <p class="spec">北美胡桃木 · CXZ-003 · 2.4-3.2M</p>
+                        <p class="desc">以云为意，以器载道。观云茶台采用顶级北美黑胡桃木，纹理如行云流水，尽显大气磅礴之势。每一件都是独一无二的艺术品。</p>
+                        <div class="product-btns">
+                            <a href="#" class="home-cta home-cta-outline" onclick="showDetailModal('观云', '北美胡桃木 · CXZ-003 · 2.4-3.2M', '以云为意，以器载道。观云茶台采用顶级北美黑胡桃木，纹理如行云流水，尽显大气磅礴之势。每一件都是独一无二的艺术品。', 'images/guanyun3.jpeg')">茶台详情</a>
+                            <a href="#" class="home-cta" onclick="showWechatModal()">立即询价</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-grid-small">
+                    <div class="product-small active" onclick="changeProduct('观云', '北美胡桃木 · CXZ-003 · 2.4-3.2M', '以云为意，以器载道。观云茶台采用顶级胡桃木，纹理如行云流水，尽显大气磅礴之势。', '典藏', 'images/guanyun2.jpeg', 'images/guanyun3.jpeg', this)">
+                        <h4>观云</h4>
+                        <p>北美胡桃木</p>
+                    </div>
+                    <div class="product-small" onclick="changeProduct('听松', '缅甸柚木 · CXZ-051 · 2.2-3.6M', '聆听松涛，品味自然。听松茶台选用柚木，质地细腻，香气宜人，营造宁静雅致的茶空间。', '经典', 'images/tingsong2.jpeg', 'images/tingsong3.jpeg', this)">
+                        <h4>听松</h4>
+                        <p>缅甸柚木</p>
+                    </div>
+                    <div class="product-small" onclick="changeProduct('望月', '欧洲山榆木 · CXZ-002 · 2.2-3.5M', '仰望明月，心静如水。望月茶台采用珍稀山榆木，色泽温润，纹理优美，彰显东方美学。', '臻品', 'images/wangyue2.jpeg', 'images/wangyue3.jpeg', this)">
+                        <h4>望月</h4>
+                        <p>欧洲山榆木</p>
+                    </div>
+                    <div class="product-small" onclick="changeProduct('临水', '南美黄金檀木 · CXZ-052 · 2.9-3.9M', '临水而居，心境悠然。临水茶台选用珍贵黄金檀木，木质坚硬，纹理细密，是收藏级茶台之选。', '限量', 'images/linshui2.jpeg', 'images/linshui3.jpeg', this)">
+                        <h4>临水</h4>
+                        <p>南美黄金檀木</p>
+                    </div>
+                    <div class="product-small" onclick="changeProduct('闻竹', '俄罗斯柞木 · CXZ-040 · 2.0-3.0M', '清风徐来，竹影婆娑。闻竹茶台选用柞木，纹理如竹节般清雅，营造文人雅士的品茗意境。', '雅集', 'images/wenzhu2.jpeg', 'images/wenzhu3.jpeg', this)">
+                        <h4>闻竹</h4>
+                        <p>俄罗斯柞木</p>
+                    </div>
+                    <div class="product-small" onclick="changeProduct('衔山', '北美白橡木 · CXZ-038 · 2.2-3.5M', '高山流水，知音难觅。衔山茶台采用珍稀白橡木，纹理如山峦般错落有致，为茶空间增添艺术气息。', '珍藏', 'images/xianshan2.jpeg', 'images/xianshan3.jpeg', this)">
+                        <h4>衔山</h4>
+                        <p>北美白橡木</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 联系我们 -->
+            <div class="tab-content" id="tab-contact">
+                <div class="page-header">
+                    <p class="label">Contact</p>
+                    <h1>预约咨询</h1>
+                </div>
+                <div class="contact-layout">
+                    <div class="contact-info-box">
+                        <h3>云序茶居</h3>
+                        <div class="contact-intro">
+                            <p>珲春云序智联信息科技有限公司旗下高端茶台品牌，专注现代茶空间定制。以序为法，匠造东方茶居之美，为每一位客户打造可传承世家的雅器。</p>
+                        </div>
+                        <div class="contact-item">
+                            <h4>销售代理</h4>
+                            <p>珲春云序智联信息科技有限公司</p>
+                        </div>
+                        <div class="contact-item">
+                            <h4>品鉴中心</h4>
+                            <p>中国 · 浙江 · 台州</p>
+                        </div>
+                        <div class="contact-item">
+                            <h4>服务时间</h4>
+                            <p>周一至周日 9:00-18:00</p>
+                        </div>
+                    </div>
+                    <div class="contact-qr-box">
+                        <h4>添加微信咨询</h4>
+                        <p>扫码添加专属顾问，获取详细报价</p>
+                        <div class="contact-qr-img">
+                            <img src="images/kefu-qrcode.png" alt="微信二维码">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 微信二维码弹窗 -->
+    <div class="wechat-modal" id="wechatModal" onclick="closeWechatModal(event)">
+        <div class="wechat-modal-content" onclick="event.stopPropagation()">
+            <span class="wechat-modal-close" onclick="closeWechatModal()">&times;</span>
+            <h3>添加微信咨询</h3>
+            <p>扫码添加专属顾问，获取详细报价</p>
+            <div class="wechat-qr">
+                <img src="images/kefu-qrcode.png" alt="微信二维码">
+            </div>
+        </div>
+    </div>
+
+    <!-- 茶台详情弹窗 -->
+    <div class="detail-modal" id="detailModal" onclick="closeDetailModal(event)">
+        <div class="detail-modal-content" onclick="event.stopPropagation()">
+            <span class="detail-modal-close" onclick="closeDetailModal()">&times;</span>
+            <div class="detail-modal-image">
+                <img id="detailModalImg" src="" alt="茶台详情">
+            </div>
+            <div class="detail-modal-info">
+                <h3 id="detailModalTitle">茶台名称</h3>
+                <p class="spec" id="detailModalSpec">规格信息</p>
+                <p class="desc" id="detailModalDesc">产品描述</p>
+                <div class="detail-params">
+                    <h4>详细参数</h4>
+                    <div class="param-row">
+                        <span class="param-label">材质</span>
+                        <span class="param-value" id="detailMaterial">-</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">尺寸范围</span>
+                        <span class="param-value" id="detailSize">-</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">工艺</span>
+                        <span class="param-value" id="detailCraft">传统榫卯 / 手工打磨</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">表面处理</span>
+                        <span class="param-value" id="detailFinish">天然木蜡油</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">编号</span>
+                        <span class="param-value" id="detailOrigin">北美进口</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">定制周期</span>
+                        <span class="param-value" id="detailPeriod">50-60天</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">质保期限</span>
+                        <span class="param-value" id="detailWarranty">终身维护</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示微信二维码弹窗
+        function showWechatModal() {
+            document.getElementById('wechatModal').classList.add('active');
+        }
+
+        // 关闭微信二维码弹窗
+        function closeWechatModal(event) {
+            if (!event || event.target.id === 'wechatModal' || event.target.classList.contains('wechat-modal-close')) {
+                document.getElementById('wechatModal').classList.remove('active');
+            }
+        }
+
+        // 显示茶台详情弹窗
+        function showDetailModal(name, spec, desc, image) {
+            document.getElementById('detailModalTitle').textContent = name + '茶台';
+            document.getElementById('detailModalSpec').textContent = spec;
+            document.getElementById('detailModalDesc').textContent = desc;
+            document.getElementById('detailModalImg').src = image;
+            document.getElementById('detailModalImg').alt = name + '茶台';
+
+            // 解析规格信息
+            const specParts = spec.split(' · ');
+            if (specParts.length >= 2) {
+                document.getElementById('detailMaterial').textContent = specParts[0];
+                const sizeMatch = specParts[2] ? specParts[2].match(/[\d.-]+M/) : null;
+                document.getElementById('detailSize').textContent = sizeMatch ? sizeMatch[0] : '可定制';
+            }
+
+            // 设置独立参数
+            const params = productParams[name] || productParams['观云'];
+            document.getElementById('detailCraft').textContent = params.craft;
+            document.getElementById('detailPeriod').textContent = params.period;
+            document.getElementById('detailWarranty').textContent = params.warranty;
+            document.getElementById('detailOrigin').textContent = params.origin;
+            document.getElementById('detailFinish').textContent = params.finish;
+
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        // 关闭茶台详情弹窗
+        function closeDetailModal(event) {
+            if (!event || event.target.id === 'detailModal' || event.target.classList.contains('detail-modal-close')) {
+                document.getElementById('detailModal').classList.remove('active');
+            }
+        }
+
+        // 切换标签页
+        function showTab(tabName, element) {
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // 显示目标内容
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            // 更新导航状态
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            if (element) element.classList.add('active');
+        }
+
+        // 产品详细参数配置
+        const productParams = {
+            '观云': { craft: '柚木色 / 宝格丽大理石', period: '50-60天', warranty: '终身维护', origin: 'CXZ-003', finish: '进口榉木框架 / 意大利ICA油漆' },
+            '听松': { craft: '柚木纹 / 茶桌本体木色', period: '50-60天', warranty: '终身维护', origin: 'CXZ-051', finish: '进口榉木框架 / 意大利ICA油漆' },
+            '望月': { craft: '榆木炭黑 / 宝格丽大理石', period: '50-60天', warranty: '终身维护', origin: 'CXZ-002', finish: '进口榉木框架 / 意大利ICA油漆' },
+            '临水': { craft: '柚木色 / 寒江雪大理石', period: '50-60天', warranty: '终身维护', origin: 'CXZ-052', finish: '进口榉木框架 / 意大利ICA油漆' },
+            '闻竹': { craft: '结疤白橡木 / 爵士白大理石', period: '50-60天', warranty: '终身维护', origin: 'CXZ-040', finish: '进口榉木框架 / 意大利ICA油漆' },
+            '衔山': { craft: '直纹锯齿纹 / 洞石石脚 / 普拉达绿大理石岛台', period: '50-60天', warranty: '终身维护', origin: 'CXZ-038', finish: '进口榉木框架 / 意大利ICA油漆' }
+        };
+
+        // 切换产品
+        function changeProduct(name, spec, desc, tag, image, detailImage, element) {
+            const display = document.getElementById('product-display');
+            display.setAttribute('data-product', name);
+            display.querySelector('.tag').textContent = tag;
+            display.querySelector('img').src = image;
+            display.querySelector('img').alt = name + '茶台';
+
+            const infoHtml = `
+                <h2>${name}茶台</h2>
+                <p class="spec">${spec}</p>
+                <p class="desc">${desc}</p>
+                <div class="product-btns">
+                    <a href="#" class="home-cta home-cta-outline" onclick="showDetailModal('${name}', '${spec}', '${desc}', '${detailImage}')">茶台详情</a>
+                    <a href="#" class="home-cta" onclick="showWechatModal()">立即询价</a>
+                </div>
+            `;
+            document.getElementById('product-info').innerHTML = infoHtml;
+
+            // 更新选中状态
+            document.querySelectorAll('.product-small').forEach(p => p.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // 首页轮播图
+        let currentSlide = 0;
+        const totalSlides = 3;
+        let slideInterval;
+
+        function updateSlider() {
+            const track = document.getElementById('sliderTrack');
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+            // 更新 dots
+            document.querySelectorAll('.slider-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlider();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlider();
+            resetInterval();
+        }
+
+        function resetInterval() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+
+        // 鼠标左右滑动翻页
+        const slider = document.getElementById('homeSlider');
+        let startX = 0;
+        let isDragging = false;
+
+        slider.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            isDragging = true;
+            slider.style.cursor = 'grabbing';
+        });
+
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+        });
+
+        slider.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            slider.style.cursor = 'grab';
+
+            const endX = e.clientX;
+            const diff = startX - endX;
+
+            // 滑动超过50px才触发翻页
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    // 向左滑动，下一张
+                    nextSlide();
+                } else {
+                    // 向右滑动，上一张
+                    prevSlide();
+                }
+                resetInterval();
+            }
+        });
+
+        slider.addEventListener('mouseleave', () => {
+            isDragging = false;
+            slider.style.cursor = 'grab';
+        });
+
+        // 触摸滑动支持
+        slider.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        }, { passive: true });
+
+        slider.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+                resetInterval();
+            }
+        }, { passive: true });
+
+        // 启动自动轮播
+        slideInterval = setInterval(nextSlide, 5000);
+    </script>
+</body>
+</html>
